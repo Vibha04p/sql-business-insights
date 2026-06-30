@@ -608,7 +608,7 @@ join information_schema.key_column_usage    kcu on tc.constraint_name = kcu.cons
 join information_schema.constraint_column_usage ccu on ccu.constraint_name = tc.constraint_name
 where tc.constraint_type = 'FOREIGN KEY' and tc.table_schema = 'ecom';
 ```
-Gave me no foreign keys or the result was nothing
+Gave me no foreign keys, or the result was nothing
 Explored logical relationships between tables. Ran the following query for every relationship I could find between tables:
 
 SELECT COUNT(*) AS unmatched_orders
@@ -740,14 +740,14 @@ I have identified the following key tables that could be interconnected and may 
        DELIVERED	200
        Shipped	150
 
-   Most of the orders have the status as delivered followed by shipped. There is inconsistency with the values being entered, which have to be standardised before analysis. i.e., shipped has been repeated 3 times and delivered 2 times. There are only 6 categories otherwise.
+   Most of the orders have the status as delivered, followed by shipped. There is an inconsistency with the values being entered, which have to be standardised before analysis. i.e., shipped has been repeated 3 times and delivered 2 times. There are only 6 categories otherwise.
    No null/missing values observed.
 
  2.payment_status
        payment_status	n
        paid	37,822
        failed	2,178
-   There are only two categories here where the customers paid status is clearly more than the failed status.
+   There are only two categories here where the customers' paid status is clearly more than the failed status.
    No null/missing values observed.
 
 3. Addresses
@@ -755,8 +755,8 @@ I have identified the following key tables that could be interconnected and may 
        India	13,929
        United States	2,071
 
-There are no NULL/missing values in the data. There is a clear distribution between the 2 categories i.e. India and US. Indian customers are at majority here.
-In the customers.country column there were missing/null values. Maybe we could do something with this data here compare and conclude.
+There are no NULL/missing values in the data. There is a clear distribution between the 2 categories i.e., India and the US. Indian customers are in the majority here.
+In the customers. country column, there were missing/null values. Maybe we could do something with this data here, compare, and conclude.
 
 4. order_status_history
    1. status	n
@@ -766,7 +766,7 @@ In the customers.country column there were missing/null values. Maybe we could d
        shipped	28,183
        delivered	20,043
        cancelled	2,044
-       Compare with Orders.status, this is more clear.
+       Compare with Orders. Status, this is clearer.
    No null/missing values observed.
 
 5. Devices
@@ -775,7 +775,7 @@ In the customers.country column there were missing/null values. Maybe we could d
        mobile	61,466
        desktop	21,168
        tablet	2,534
-   Divice type shows that they sell mobiles, desktops and tablets. They have highest number of mobile collection.
+   Device type shows that they sell mobiles, desktops, and tablets. They have the highest number of mobile collections.
     No null/missing values observed.
 
 6. session_channels
@@ -786,7 +786,7 @@ In the customers.country column there were missing/null values. Maybe we could d
        email	6,995
        affiliate	6,030
 
-   Highest is through organic sessions followed by the rest.
+   The highest is through organic sessions, followed by the rest.
    No null/missing values observed.
 
 7.payment_transactions
@@ -797,7 +797,7 @@ payu	9,948
 stripe	7,239
 cash	4,775
 
-Maximum number of transactions go through razorpay followed by the rest.
+The maximum number of transactions go through Razorpay, followed by the rest.
  No null/missing values observed.
 
 8. price_lists
@@ -806,7 +806,7 @@ Maximum number of transactions go through razorpay followed by the rest.
 USD	1
 INR	1
 
-Only USD or INR transactions are happenening.
+Only USD or INR transactions are happening.
  No null/missing values observed.
 
 9. shipping_carriers
@@ -834,7 +834,7 @@ succeeded	227
 initiated	20
 failed	13
 
-Maximum number of refunds have succeeded.
+The maximum number of refunds has succeeded.
 
 
 Block 5:
@@ -844,236 +844,236 @@ Ran the following
 SELECT COUNT(*)
 FROM ecom.collections;
 
-on collections,consents,collection_products --- all of them returned zero which menas the tables are actually empty. I had pointed out previously as well as the row count was zero but will use this method to verify.
+On collections, consents,collection_products --- all of them returned zero, which means the tables are actually empty. I had pointed out previously that the row count was zero, but will use this method to verify.
 
 
 **TABLES AT A GLANCE:**
 
 session_events
 
-Tells us what type of session is going on, most likely whether the customer is browsing or at checkout, what the product is, at what time the event occurred, and what the cost of the cart/product is based on the customer ID.
+Each row shows us what type of session is going on, most likely whether the customer is browsing or at checkout, what the product is, at what time the event occurred, and what the cost of the cart/product is based on the customer ID.
 
 Rows: 292,903
 
 order_status_history
 
-Tells us which order ID has what status (i.e., paid, packed, shipped, delivered, or cancelled), at what time the status changed, and if cancelled, the reason for cancellation.
+Each row shows us which order ID has what status (i.e., paid, packed, shipped, delivered, or cancelled), at what time the status changed, and if cancelled, the reason for cancellation.
 
 Rows: 158,414
 
 sessions
 
-Shows which customer from which part of the world (country, region, city) started browsing, at what time the session started and ended. It also stores the IP address and the device ID used for shopping.
+Each row shows which customer from which part of the world (country, region, city) started browsing, at what time the session started and ended. It also stores the IP address and the device ID used for shopping.
 
 Rows: 100,000
 
 devices
 
-Tells us information about the device used for shopping, including the device type, operating system, browser, and model.
+Each row shows us information about the device used for shopping, including the device type, operating system, browser, and model.
 
 Rows: 85,168
 
 order_items
 
-Tells us, based on the order ID, which product variant was bought, the quantity purchased, and the total cost.
+Each row shows us, based on the order ID, which product variant was bought, the quantity purchased, and the total cost.
 
 Rows: 81,806
 
 payment_transactions
 
-Tells us which payment gateway was used and whether the payment transaction was successful or failed.
+Each row shows us which payment gateway was used and whether the payment transaction was successful or failed.
 
 Rows: 40,034
 
 orders
 
-Shows complete information about an order, from the order ID and customer who placed it to the payment status, shipping details, total amount, and any applied promo code or coupon.
+Each row shows complete information about an order, from the order ID and customer who placed it to the payment status, shipping details, total amount, and any applied promo code or coupon.
 
 Rows: 40,000
 
 payment_intents
 
-Shows whether the payment for an order has been completed or not, along with the payment method used and the total bill amount.
+Each row shows whether the payment for an order has been completed or not, along with the payment method used and the total bill amount.
 
 Rows: 40,000
 
 attribution_campaigns
 
-Shows the advertising cost attributed to each marketing campaign.
+Each row shows the advertising cost attributed to each marketing campaign.
 
 Rows: 38,405
 
 shipments
 
-Mentions the shipping method used, the shipping carrier, whether the order was delivered or not, based on the order ID, along with when the order was shipped and delivered.
+Each row shows the shipping method used, the shipping carrier, whether the order was delivered or not, based on the order ID, along with when the order was shipped and delivered.
 
 Rows: 32,089
 
 inventory_movements
 
-Shows at what time, how many units of a particular product variant moved into or out of a warehouse. It tells us about the product inventory movement in a particular warehouse.
+Each row shows at what time, how many units of a particular product variant moved into or out of a warehouse. It tells us about the product inventory movement in a particular warehouse.
 
 Rows: 30,207
 
 prices
 
-Shows the current list price and sale price of each product variant, along with the validity period for that pricing.
+Each row shows the current list price and sale price of each product variant, along with the validity period for that pricing.
 
 Rows: 24,180
 
 loyalty_transactions
 
-Acts as a passbook for customer loyalty points, where every row records one change in a customer's points balance.
+Each row shows a passbook for customer loyalty points, where every row records one change in a customer's points balance.
 
 Rows: 21,475
 
 segment_memberships
 
-Tells us from when to when a customer's segment membership is valid.
+Each row shows us from when to when a customer's segment membership is valid.
 
 Rows: 16,461
 
 addresses
 
-Tells us the complete address details of a customer based on the address ID.
+Each row shows us the complete address details of a customer based on the address ID.
 
 Rows: 16,000
 
 customer_addresses
 
-Links the customer ID to the address ID, along with the address type, and mentions whether it is the default address or not.
+Each row shows links the customer ID to the address ID, along with the address type, and mentions whether it is the default address or not.
 
 Rows: 16,000
 
 product_variants
 
-Contains the complete details of every product variant, including the size, colour, SKU, and other attributes.
+Each row shows the complete details of every product variant, including the size, colour, SKU, and other attributes.
 
 Rows: 12,090
 
 customers
 
-Gives the complete details of each customer.
+Each row shows the complete details of each customer.
 
 Rows: 10,000
 
 product_reviews
 
-Gives details of which product was reviewed, the review itself, the rating, when it was reviewed, along with the associated order ID.
+Each row shows details of which product was reviewed, the review itself, the rating, when it was reviewed, along with the associated order ID.
 
 Rows: 8,000
 
 notifications
 
-Shows what kind of notification was sent to a particular customer and through which channel.
+Each row shows what kind of notification was sent to a particular customer and through which channel.
 
 Rows: 6,856
 
 products
 
-Contains complete product details, including the brand, category, description, and product name.
+Each row shows complete product details, including the brand, category, description, and product name.
 
 Rows: 4,000
 
 loyalty_accounts
 
-Contains the customer ID, when the loyalty account was created, and the customer's loyalty tier (such as Bronze, Silver, or Gold).
+Each row shows the customer ID, when the loyalty account was created, and the customer's loyalty tier (such as Bronze, Silver, or Gold).
 
 Rows: 3,000
 
 return_items
 
-Shows which item was returned, the quantity returned, and the associated reason code.
+Each row shows which item was returned, the quantity returned, and the associated reason code.
 
 Rows: 2,004
 
 inventory_items
 
-Shows the quantity of each product variant currently in stock and how much inventory is reserved.
+Each row shows the quantity of each product variant currently in stock and how much inventory is reserved.
 
 Rows: 2,000
 
 return_requests
 
-Shows which customer requested a return for which order and the current status of the return request.
+Each row shows which customer requested a return for which order and the current status of the return request.
 
 Rows: 1,603
 
 refunds
 
-Shows the refund details for an order, including the refund amount, reason, status, and creation date.
+Each row shows the refund details for an order, including the refund amount, reason, status, and creation date.
 
 Rows: 260
 
 brands
 
-Tells us the brand ID and the corresponding brand name.
+Each row shows us the brand ID and the corresponding brand name.
 
 Rows: 120
 
 marketing_campaigns
 
-Tells us the budget, marketing channel, and when the campaign starts and ends.
+Each row shows us the budget, marketing channel, and when the campaign starts and ends.
 
 Rows: 100
 
 coupons
 
-Tells us the coupon code, discount value, usage limit per customer, validity period, and whether the coupon is active.
+Each row shows us the coupon code, discount value, usage limit per customer, validity period, and whether the coupon is active.
 
 Rows: 50
 
 promotion_rules
 
-Defines the rules for applying a promotion, such as the minimum cart value and any applicable product or category restrictions.
+Each row shows the rules for applying a promotion, such as the minimum cart value and any applicable product or category restrictions.
 
 Rows: 30
 
 promotions
 
-Shows the promotion details, including the promotion type, discount type, discount value, validity period, and whether the promotion is active.
+Each row shows the promotion details, including the promotion type, discount type, discount value, validity period, and whether the promotion is active.
 
 Rows: 20
 
 experiment_variants
 
-Stores the different versions of an A/B test, the percentage of users allocated to each version, and identifies whether the variant is the control or the test version.
+Each row shows the different versions of an A/B test, the percentage of users allocated to each version, and identifies whether the variant is the control or the test version.
 
 Rows: 12
 
 customer_segments
 
-Shows which customer segment a customer belongs to, such as new, active, at-risk, or churned.
+Each row shows which customer segment a customer belongs to, such as new, active, at-risk, or churned.
 
 Rows: 10
 
 return_reasons
 
-Stores the predefined reasons for product returns.
+Each row shows the predefined reasons for product returns.
 
 Rows: 8
 
 experiments
 
-Shows the details of the A/B experiments conducted to test different features or experiences.
+Each row shows the details of the A/B experiments conducted to test different features or experiences.
 
 Rows: 6
 
 payment_methods
 
-Shows the different payment methods available for customers to use.
+Each row shows the different payment methods available for customers to use.
 
 Rows: 5
 
 shipping_methods
 
-Shows the different shipping methods available for delivering orders.
+Each row shows the different shipping methods available for delivering orders.
 
 Rows: 3
 
 shipping_carriers
 
-Shows the different shipping carriers used for order deliveries.
+Each row shows the different shipping carriers used for order deliveries.
 
 Rows: 3
 
@@ -1083,3 +1083,13 @@ Shows the available price lists and the currency used (INR or USD).
 
 Rows: 2
 
+
+May be useful later:
+
+Customer --->> orders, order_items, returns, membership, sessions, addresses, payment_intents, shipments
+Products -->> prices, product_variants,inventory
+marketing-->> attribution, customers, orders
+payments
+orders
+returns
+orders-->>returns, refunds, payments
