@@ -1,0 +1,128 @@
+-- ### Monthly Signup Cohort Retention
+--**Growth Head question:** *“For each month’s new signups, how many came back in months 1, 2, 3?”*
+--**Output:** `cohort_month, cohort_size, m1_retained, m2_retained, m3_retained, m1_retention_rate, m2_retention_rate, m3_retention_rate`
+--**Sanity check:** `cohort_size` for any month equals `count(distinct customer_id)` from `ecom.customers` where `date_trunc('month', created_at) = cohort_month`. All retention rates in `[0, 1]`.
+--**Pattern note:** `customer_first_order_month` CTE, then self-join on offset months. Customers who signed up but never ordered still count in `cohort_size` (contribute zero to retention). Exclude cancelled orders from "retained" — document that choice.
+--> *Censoring caveat: the dataset holds ~4 signup months, so m3 is only fully observable for the earliest cohort — later cohorts’ m2/m3 cells are censored, not zero. Show censored cells as blank/NULL (never 0%) and say so in your interpretation. Spotting this unprompted is a senior-analyst signal.*
+-- Business Question:
+-- For each month's new signups, how many placed their first successful order
+-- in Month 1, Month 2 and Month 3 after signup?
+
+
+
+
+-- CTE 1: Customer First Order Month
+-- Grain: One row per customer.
+-- Calculates each customer's signup cohort and the month of their
+-- first successful (non-cancelled) order.
+with customer_first_order_month as (
+    select
+        c.customer_id,
+        date_trunc('month', c.created_at) :: date as cohort_month,
+        min(date_trunc('month', o.created_at) :: date) filter (
+            where
+                lower(o.status) != 'cancelled'
+        ) as first_order_month
+    from
+        ecom.customers c
+        left join ecom.orders o on c.customer_id = o.customer_id
+    group by
+        1,
+        2
+)
+  
+-- CTE 2: Cohort Metrics
+-- Grain: One row per cohort_month.
+-- Aggregates cohort size and counts customers whose first successful
+-- order occurred in Month 1, Month 2 and Month 3 after signup.
+,
+cohort_metrics as (
+    select
+        cf.cohort_month,
+        count(distinct cf.customer_id) as cohort_size,
+        count(distinct cf.customer_id) filter (
+            where
+                cf.first_order_month = cf.cohort_month + interval '1 month'
+        ) as m1_retained,
+        count(distinct cf.customer_id) filter (
+            where
+                cf.first_order_month = cf.cohort_month + interval '2 months'
+        ) as m2_retained,
+        count(distinct cf.customer_id) filter (
+            where
+                cf.first_order_month = cf.cohort_month + interval '3 months'
+        ) as m3_retained
+    from
+        customer_first_order_month cf
+    group by
+        1
+) -- Retention metrics beyond the latest observable order month are shown
+-- as NULL instead of 0 to distinguish unavailable data from zero retention.
+select
+    cm.cohort_month,
+    cm.cohort_size,
+    case
+        when cm.cohort_month + interval '1 month' > (
+            select
+                date_trunc('month', max(created_at))
+            from
+                ecom.orders
+        ) then null
+        else cm.m1_retained
+    end as m1_retained,
+    case
+        when cm.cohort_month + interval '2 months' > (
+            select
+                date_trunc('month', max(created_at))
+            from
+                ecom.orders
+        ) then null
+        else cm.m2_retained
+    end as m2_retained,
+    case
+        when cm.cohort_month + interval '3 months' > (
+            select
+                date_trunc('month', max(created_at))
+            from
+                ecom.orders
+        ) then null
+        else cm.m3_retained
+    end as m3_retained,
+    case
+        when cm.cohort_month + interval '1 month' > (
+            select
+                date_trunc('month', max(created_at))
+            from
+                ecom.orders
+        ) then null
+        else (cm.m1_retained * 1.0) / nullif(cm.cohort_size, 0)
+    end as m1_retention_rate,
+    case
+        when cm.cohort_month + interval '2 months' > (
+            select
+                date_trunc('month', max(created_at))
+            from
+                ecom.orders
+        ) then null
+        else (cm.m2_retained * 1.0) / nullif(cm.cohort_size, 0)
+    end as m2_retention_rate,
+    case
+        when cm.cohort_month + interval '3 months' > (
+            select
+                date_trunc('month', max(created_at))
+            from
+                ecom.orders
+        ) then null
+        else (cm.m3_retained * 1.0) / nullif(cm.cohort_size, 0)
+    end as m3_retention_rate
+from
+    cohort_metrics cm
+order by
+    cm.cohort_month;
+
+-- Interpretation Notes:
+-- Higher retention indicates faster customer activation after signup.
+-- NULL retention values indicate insufficient observation period,
+-- not zero retained customers.
+-- Retention rates are expressed as percentages of the original cohort.
+-- All retention rates are valid.
