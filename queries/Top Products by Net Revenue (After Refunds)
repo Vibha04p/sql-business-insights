@@ -1,0 +1,94 @@
+-- ### Q4 — Top Products by Net Revenue (After Refunds)
+--**CFO question:** *“Which products actually make us money — net of returns?”*
+--**Output:** `product_id, product_name, category, gross_revenue, orders_count, units_sold, returns_count, return_rate, refunds_amount, net_revenue`
+--**Sanity check:** `sum(gross_revenue)` across all products equals `sum(qty * unit_price)` from `ecom.order_items` for the same window, within 0.5%.
+--**Pattern note:** Three CTEs (`product_revenue`, `product_returns`, `product_refunds`) joined in the final select. Don’t try a single join — you’ll double-count.
+--### Q4 — Top Products by Net Revenue (After Refunds)
+--**CFO question:** *“Which products actually make us money — net of returns?”*
+--**Output:** `product_id, product_name, category, gross_revenue, orders_count, units_sold, returns_count, return_rate, refunds_amount, net_revenue`
+--**Sanity check:** `sum(gross_revenue)` across all products equals `sum(qty * unit_price)` from `ecom.order_items` for the same window, within 0.5%.
+--**Pattern note:** Three CTEs (`product_revenue`, `product_returns`, `product_refunds`) joined in the final select. Don’t try a single join — you’ll double-count.
+WITH product_revenue AS (
+    SELECT
+        p.product_id
+        ,p.product_name
+        ,c.category_name AS category
+        ,SUM(oi.qty * oi.unit_price) AS gross_revenue
+        ,COUNT(DISTINCT oi.order_id) AS orders_count
+        ,SUM(oi.qty) AS units_sold
+    FROM
+        ecom.order_items oi
+        INNER JOIN ecom.orders o ON oi.order_id = o.order_id
+        INNER JOIN ecom.product_variants pv ON oi.variant_id = pv.variant_id
+        INNER JOIN ecom.products p ON pv.product_id = p.product_id
+        INNER JOIN ecom.categories c ON p.category_id = c.category_id
+    WHERE
+        LOWER(o.payment_status) = 'paid'
+    GROUP BY
+        p.product_id,
+        p.product_name,
+        c.category_name
+)
+,product_returns AS (
+    SELECT
+        p.product_id
+        ,SUM(ri.qty) AS returns_count
+    FROM
+        ecom.return_items ri
+        INNER JOIN ecom.product_variants pv ON ri.variant_id = pv.variant_id
+        INNER JOIN ecom.products p ON pv.product_id = p.product_id
+    GROUP BY
+        p.product_id
+) 
+-- Assumptions:
+-- - returns_count represents the total returned units (SUM(qty))
+--   from return_items.
+-- - All return requests are included because the business requirement
+--   does not specify filtering by return status.
+,order_return_qty AS (
+    SELECT
+        rr.order_id
+        ,SUM(ri.qty) AS total_return_qty
+    FROM
+        ecom.return_requests rr
+        INNER JOIN ecom.return_items ri ON rr.return_id = ri.return_id
+    GROUP BY
+        rr.order_id
+) 
+-- Assumption:
+-- Refunds are recorded at the order level. Since product-level refund
+-- amounts are unavailable, refund amounts are allocated to returned
+-- products in proportion to their returned quantity within each order.
+
+,product_refunds AS (
+    SELECT
+        pv.product_id
+        ,SUM(
+            r.refund_amount * ri.qty * 1.0 / NULLIF(ort.total_return_qty, 0)
+        ) AS refunds_amount
+    FROM
+        ecom.order_refunds r
+        INNER JOIN ecom.return_requests rr ON r.order_id = rr.order_id
+        INNER JOIN ecom.return_items ri ON ri.return_id = rr.return_id
+        INNER JOIN ecom.product_variants pv ON ri.variant_id = pv.variant_id
+        INNER JOIN order_return_qty ort ON rr.order_id = ort.order_id
+    GROUP BY
+        pv.product_id
+)
+SELECT
+    pr.product_id
+    ,pr.product_name
+    ,pr.category
+    ,pr.gross_revenue
+    ,pr.orders_count
+    ,pr.units_sold
+    ,COALESCE(pe.returns_count, 0) as returns_count
+    ,COALESCE(pe.returns_count, 0) * 1.0 / nullif(pr.units_sold, 0) as returns_rate
+    ,COALESCE(pf.refunds_amount, 0) as refunds_amount
+    ,(pr.gross_revenue - COALESCE(pf.refunds_amount, 0)) as net_revenue
+from
+    product_revenue pr
+    left join product_returns pe on pr.product_id = pe.product_id
+    left join product_refunds pf ON pr.product_id = pf.product_id
+ORDER BY
+    net_revenue DESC;
