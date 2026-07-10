@@ -1,0 +1,10 @@
+--### Q10 — Attribution Comparison: First-Touch vs Last-Touch Revenue by Channel
+
+--**Marketing Mix question:** *"Does our channel mix look different under first-touch vs last-touch? Which channels open the funnel vs close it?"*
+
+--**Output:** `attribution_model, channel, revenue, orders, share_of_revenue` — two rows per channel.
+
+--**Sanity check:** Total revenue under `first_touch` equals total under `last_touch` equals total non-cancelled revenue in `ecom.orders`, within 0.5%. (Attribution re-allocates revenue; it doesn't change the total.)
+
+--**Pattern note:** Two `row_number()` partitions on `attribution_touches` per `customer_id` or `order_id` — one `asc`, one `desc`. Join both back to orders. Orders with no touches bucket as `'direct'`; do not drop.
+
