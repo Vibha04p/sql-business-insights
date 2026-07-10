@@ -9,3 +9,67 @@
 --**Sanity check:** `avg_delivery_days <= p90_delivery_days` on every row (mean ≤ p90 in any sane distribution). `late_rate ∈ [0, 1]`.
 
 --**Pattern note:** `percentile_cont(0.9) within group (order by delivery_days)`. Many candidates have never used this — knowing it signals seniority. Shipments where `delivered_at IS NULL` are excluded (in transit). If `shipped_at > delivered_at` exists, surface it in your interpretation as a data quality finding.
+
+with carrier_orders as (
+    SELECT
+        c.carrier_name as carrier
+        , sm.method_name as shipping_method
+        , count(s.order_id) as delivered_orders
+    from
+        ecom.shipping_methods sm
+        inner join ecom.shipments s on sm.shipping_method_id = s.shipping_method_id
+        inner join ecom.shipping_carriers c on s.carrier_id = c.carrier_id
+    WHERE
+        delivered_at IS NOT NULL
+    group by
+        c.carrier_id
+        , c.carrier_name
+        , sm.method_name
+)
+, shipment_details as(
+    SELECT
+        c.carrier_name as carrier
+        , sm.method_name as shipping_method
+        , (s.delivered_at :: date - s.shipped_at :: date) as delivery_days
+    from
+        ecom.shipping_methods sm
+        inner join ecom.shipments s on sm.shipping_method_id = s.shipping_method_id
+        inner join ecom.shipping_carriers c on s.carrier_id = c.carrier_id
+    WHERE
+        delivered_at IS NOT NULL
+)
+select
+    co.carrier
+    , co.shipping_method
+    , co.delivered_orders
+    , avg(sd.delivery_days) as average_delivery_days
+    , PERCENTILE_CONT(0.5) WITHIN GROUP (
+        ORDER BY
+            sd.delivery_days
+    ) as median_delivery_days
+    , PERCENTILE_CONT(0.9) WITHIN GROUP (
+        ORDER BY
+            sd.delivery_days
+    ) as p90_delivery_days
+    , COUNT(*) FILTER(
+        where
+            delivery_days > 5
+    ) as late_deliveries
+    ,COUNT(*) FILTER (
+        WHERE
+            delivery_days > 5
+    ) * 1.0 / COUNT(*) as late_rate
+from
+    carrier_orders co
+    left join shipment_details sd on co.shipping_method = sd.shipping_method
+    AND co.carrier = sd.carrier
+group by
+    co.carrier
+    , co.shipping_method
+    , co.delivered_orders;
+
+--No shipments were found where shipped_at > delivered_at, indicating no obvious timestamp inconsistencies.
+SELECT
+    COUNT(*)
+FROM ecom.shipments
+WHERE shipped_at > delivered_at;
