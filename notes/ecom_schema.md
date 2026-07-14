@@ -797,6 +797,8 @@ Gave me no foreign keys, or the result was nothing
 Explored logical relationships between tables. Ran the following query for every relationship I could find between tables:
 
 **C. Relationship discovery**
+
+
 SELECT COUNT(*) AS unmatched_orders
 FROM ecom.orders o
 LEFT JOIN ecom.customers c
