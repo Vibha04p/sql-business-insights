@@ -1,4 +1,4 @@
-**Block 1 — Inventory:**
+**A — Inventory:**
 
 ```sql
 select table_name, column_name, data_type, is_nullable, column_default
@@ -537,307 +537,7 @@ Columns:
 * method_name (text)
 * base_fee (numeric)
 
-**Block 2 — Row counts:**
-
-```sql
-select relname as table_name, n_live_tup as approx_row_count
-from pg_stat_user_tables
-where schemaname = 'ecom'
-order by n_live_tup desc;
-```
-
-| Table Name             | Approx. Row Count |
-| ---------------------- | ----------------: |
-| session_events         |           292,903 |
-| order_status_history   |           158,414 |
-| experiment_assignments |           140,670 |
-| attribution_touches    |           100,000 |
-| sessions               |           100,000 |
-| devices                |            85,168 |
-| order_items            |            81,806 |
-| payment_transactions   |            40,034 |
-| orders                 |            40,000 |
-| payment_intents        |            40,000 |
-| attribution_campaigns  |            38,405 |
-| shipments              |            32,089 |
-| inventory_movements    |            30,207 |
-| prices                 |            24,180 |
-| loyalty_transactions   |            21,475 |
-| segment_memberships    |            16,461 |
-| addresses              |            16,000 |
-| customer_addresses     |            16,000 |
-| product_variants       |            12,090 |
-| customers              |            10,000 |
-| product_reviews        |             8,000 |
-| product_images         |             7,188 |
-| notifications          |             6,856 |
-| products               |             4,000 |
-| loyalty_accounts       |             3,000 |
-| return_items           |             2,004 |
-| inventory_items        |             2,000 |
-| return_requests        |             1,603 |
-| refunds                |               260 |
-| brands                 |               120 |
-| marketing_campaigns    |               100 |
-| coupons                |                50 |
-| promotion_rules        |                30 |
-| promotions             |                20 |
-| categories             |                18 |
-| experiment_variants    |                12 |
-| customer_segments      |                10 |
-| return_reasons         |                 8 |
-| experiments            |                 6 |
-| payment_methods        |                 5 |
-| shipping_methods       |                 3 |
-| shipping_carriers      |                 3 |
-| price_lists            |                 2 |
-
-**These tables have no data at all**
-
-| collections            |                 0 |
-| collection_products    |                 0 |
-| consents               |                 0 |
-
-**Block 3 — Declared foreign keys:**
-
-```sql
-select tc.table_name, kcu.column_name,
-       ccu.table_name as foreign_table, ccu.column_name as foreign_column
-from information_schema.table_constraints tc
-join information_schema.key_column_usage    kcu on tc.constraint_name = kcu.constraint_name
-join information_schema.constraint_column_usage ccu on ccu.constraint_name = tc.constraint_name
-where tc.constraint_type = 'FOREIGN KEY' and tc.table_schema = 'ecom';
-```
-Gave me no foreign keys, or the result was nothing
-Explored logical relationships between tables. Ran the following query for every relationship I could find between tables:
-
-SELECT COUNT(*) AS unmatched_orders
-FROM ecom.orders o
-LEFT JOIN ecom.customers c
-    ON o.customer_id = c.customer_id
-WHERE c.customer_id IS NULL;
-
-1.orders.customer_id → customers.customer_id
-
-2.addresses.address_id -> customer_addresses.address_id
-
-3.brands.brand_id -> products.brand_id
-
-4. collections.collection_id ->collection_products.collection_id
-5. customer_segments.segment_id -> segment_memberships.segment_id
-6. return_requests.customer_id ->customers.customer_id
-7. customer.customer_id ->segment_memberships.customer_id
-8. devices.device_id ->sessions.device_id
-9. experiment_variants.experiment_id -> experiment_assignments.experiment_id
-10. experiments.experiment_id ->experiment_assignments.experiment_id
-11. experiments.experiment_id -> experiment_variants.experiment_id
-12. orders.order_id -> order_items.order_id
-13. orders.order_id -> order_status_history.order_id
-14. orders.order_id -> payment_intents.order_id
-15. payment_intents.payment_intent_id ->payment_transactions.payment_intent_id
-16. payment_methods.payment_method_id ->payment_intents.payment_method_id
-17. price_lists.price_list_id ->orders.price_list_id
-18. price_lists.price_list_id ->prices.price_list_id
-19. product_variants.variant_id ->prices.variant_id
-20. product_variants.variant_id ->return_items.variant_id
-21. products.product_id -> product_images.product_id
-22. products.product_id -> product_variants.product_id
-23. products.category_id -> promotion_rules.category_id
-24. promotions.promo_id ->orders.applied_promo_id
-25. return_reasons.reason_id -> return_items.reason_id
-26. return_requests.return_id -> return_items.return_id
-27. sessions.session_id -> attribution_touches.session_id
-28. sessions.session_id -> experiment_assignments.session_id
-29. shipping_carriers.carrier_id -> shipments.carrier_id
-30. shipping_methods.shipping_method_id -> shipments.shipping_method_id
-31. experiments.experiment_id → experiment_assignments.experiment_id
-32. experiment_variants.experiment_id → experiment_assignments.experiment_id
-
-
-
-**Block 4 — Distinct value distributions on every categorical text column** (`status`, `payment_method`, `channel`, `country`):
-
-```sql
-select status, count(*) as n from ecom.orders group by 1 order by n desc;
-```
-I have identified the following key tables that could be interconnected and may add value to further analysis:
-
-1. Customers
-   The categorical columns are as follows:
-   1. Gender
-      The dataset contains 3 categories:
-      Male: 4824
-      Female: 4736
-      Others: 227
-      NULL: 213
-
-      We can see that the distribution is close to equal but a little higher on the men's side.
-
-   2. Country
-      The dataset contains 4 major categories
-      India:7641
-      United States:1359
-      N/A:300
-      NULL:200
-      Empty string Values: 500
-      Most customers are from India
-      second largest pool of customers is from the United States.
-      However, there are a few Null values or missing values, which are again categorised into N/A, NULL, and empty string values
-
-   3.lifecycle_stage
-    The dataset contains 4 categories
-    active: 4869
-    at_risk: 3903
-    new:1200
-    churned:28
-   This shows the distribution of active customers, at-risk customers, new customers, and churned (inactive customers). Observe that at_risk customers are almost as many as active customers.
-   New customer count is good, but with the at_risk customers at such a high count, analysis must be done to know why/ when did the trend start.
-   No NULL values/missing values are observed here
-   
-   4. acquisition_channel
-      organic	4,023
-      paid	3,490
-      referral	1,192
-      email	708
-      affiliate	587
-      The distribution shows that the maximum number of acquisitions has happened organically, followed by the rest.
-      No null/missing values observed.
-
-   5. Source
-      source	n
-       linkedin	1,496
-       affiliate	1,446
-      direct	1,424
-       newsletter	1,422
-       meta	1,421
-       youtube	1,396
-       google	1,395
-      Almost a good equal distribution has happened here. 7 sources present.
-       No null/missing values observed.
-    
-    6. utm_campaign
-       utm_campaign	n
-       clearance	1,734
-       retargeting	1,726
-       new_user	1,709
-       diwali_sale	1,638
-       winter_drop	1,601
-       brand_push	1,592
-
-       Again, a good distribution almost similar for all campaign types. Total of 6 campaigns.
-        No null/missing values observed.
-
-2. Orders:
-   1. Status
-      status	n
-       delivered	19,779
-       shipped	7,715
-       paid	3,946
-       packed	3,887
-       cancelled	2,178
-       placed	1,897
-      SHIPPED	248
-       DELIVERED	200
-       Shipped	150
-
-   Most of the orders have the status as delivered, followed by shipped. There is an inconsistency with the values being entered, which have to be standardised before analysis. i.e., shipped has been repeated 3 times and delivered 2 times. There are only 6 categories otherwise.
-   No null/missing values observed.
-
- 2.payment_status
-       payment_status	n
-       paid	37,822
-       failed	2,178
-   There are only two categories here where the customers' paid status is clearly more than the failed status.
-   No null/missing values observed.
-
-3. Addresses
-  1. country	n
-       India	13,929
-       United States	2,071
-
-There are no NULL/missing values in the data. There is a clear distribution between the 2 categories i.e., India and the US. Indian customers are in the majority here.
-In the customers. country column, there were missing/null values. Maybe we could do something with this data here, compare, and conclude.
-
-4. order_status_history
-   1. status	n
-       placed	40,000
-       paid	36,055
-       packed	32,089
-       shipped	28,183
-       delivered	20,043
-       cancelled	2,044
-       Compare with Orders. Status, this is clearer.
-   No null/missing values observed.
-
-5. Devices
-   1.device_type
-   device_type	n
-       mobile	61,466
-       desktop	21,168
-       tablet	2,534
-   Device type shows that they sell mobiles, desktops, and tablets. They have the highest number of mobile collections.
-    No null/missing values observed.
-
-6. session_channels
-   channel	n
-        organic	39,924
-       paid	34,905
-       referral	12,146
-       email	6,995
-       affiliate	6,030
-
-   The highest is through organic sessions, followed by the rest.
-   No null/missing values observed.
-
-7.payment_transactions
-   gateway
-   gateway	n
-razorpay	18,072
-payu	9,948
-stripe	7,239
-cash	4,775
-
-The maximum number of transactions go through Razorpay, followed by the rest.
- No null/missing values observed.
-
-8. price_lists
-   currency
-   currency	n
-USD	1
-INR	1
-
-Only USD or INR transactions are happening.
- No null/missing values observed.
-
-9. shipping_carriers
-    carrier_name
-   carrier_name	n
-Delhivery	1
-EcomExpress	1
-Bluedart	1
-
-Three different carriers are used for shipping
-
-10. shipping_methods
-    method_name
-    method_name	n
-same_day	1
-standard	1
-express	1
-
-Three different methods of shipping are available.
-
-11. Refunds.
-    Refund status
-    method_name	n
-succeeded	227
-initiated	20
-failed	13
-
-The maximum number of refunds has succeeded.
-
-
-Block 5:
+**B. Column exploration**
 
 Ran the following 
 
@@ -1083,8 +783,343 @@ Shows the available price lists and the currency used (INR or USD).
 
 Rows: 2
 
+**C. Relationship discovery — Declared foreign keys:**
 
-May be useful later:
+```sql
+select tc.table_name, kcu.column_name,
+       ccu.table_name as foreign_table, ccu.column_name as foreign_column
+from information_schema.table_constraints tc
+join information_schema.key_column_usage    kcu on tc.constraint_name = kcu.constraint_name
+join information_schema.constraint_column_usage ccu on ccu.constraint_name = tc.constraint_name
+where tc.constraint_type = 'FOREIGN KEY' and tc.table_schema = 'ecom';
+```
+Gave me no foreign keys, or the result was nothing
+Explored logical relationships between tables. Ran the following query for every relationship I could find between tables:
+
+**C. Relationship discovery**
+SELECT COUNT(*) AS unmatched_orders
+FROM ecom.orders o
+LEFT JOIN ecom.customers c
+    ON o.customer_id = c.customer_id
+WHERE c.customer_id IS NULL;
+
+1.orders.customer_id → customers.customer_id
+
+2.addresses.address_id -> customer_addresses.address_id
+
+3.brands.brand_id -> products.brand_id
+
+4. collections.collection_id ->collection_products.collection_id
+5. customer_segments.segment_id -> segment_memberships.segment_id
+6. return_requests.customer_id ->customers.customer_id
+7. customer.customer_id ->segment_memberships.customer_id
+8. devices.device_id ->sessions.device_id
+9. experiment_variants.experiment_id -> experiment_assignments.experiment_id
+10. experiments.experiment_id ->experiment_assignments.experiment_id
+11. experiments.experiment_id -> experiment_variants.experiment_id
+12. orders.order_id -> order_items.order_id
+13. orders.order_id -> order_status_history.order_id
+14. orders.order_id -> payment_intents.order_id
+15. payment_intents.payment_intent_id ->payment_transactions.payment_intent_id
+16. payment_methods.payment_method_id ->payment_intents.payment_method_id
+17. price_lists.price_list_id ->orders.price_list_id
+18. price_lists.price_list_id ->prices.price_list_id
+19. product_variants.variant_id ->prices.variant_id
+20. product_variants.variant_id ->return_items.variant_id
+21. products.product_id -> product_images.product_id
+22. products.product_id -> product_variants.product_id
+23. products.category_id -> promotion_rules.category_id
+24. promotions.promo_id ->orders.applied_promo_id
+25. return_reasons.reason_id -> return_items.reason_id
+26. return_requests.return_id -> return_items.return_id
+27. sessions.session_id -> attribution_touches.session_id
+28. sessions.session_id -> experiment_assignments.session_id
+29. shipping_carriers.carrier_id -> shipments.carrier_id
+30. shipping_methods.shipping_method_id -> shipments.shipping_method_id
+31. experiments.experiment_id → experiment_assignments.experiment_id
+32. experiment_variants.experiment_id → experiment_assignments.experiment_id
+
+
+
+**D. Distinct values — Distinct value distributions on every categorical text column** (`status`, `payment_method`, `channel`, `country`):
+
+```sql
+select status, count(*) as n from ecom.orders group by 1 order by n desc;
+```
+I have identified the following key tables that could be interconnected and may add value to further analysis:
+
+1. Customers
+   The categorical columns are as follows:
+   1. Gender
+      The dataset contains 3 categories:
+      Male: 4824
+      Female: 4736
+      Others: 227
+      NULL: 213
+
+      We can see that the distribution is close to equal but a little higher on the men's side.
+
+   2. Country
+      The dataset contains 4 major categories
+      India:7641
+      United States:1359
+      N/A:300
+      NULL:200
+      Empty string Values: 500
+      Most customers are from India
+      second largest pool of customers is from the United States.
+      However, there are a few Null values or missing values, which are again categorised into N/A, NULL, and empty string values
+
+   3.lifecycle_stage
+    The dataset contains 4 categories
+    active: 4869
+    at_risk: 3903
+    new:1200
+    churned:28
+   This shows the distribution of active customers, at-risk customers, new customers, and churned (inactive customers). Observe that at_risk customers are almost as many as active customers.
+   New customer count is good, but with the at_risk customers at such a high count, analysis must be done to know why/ when did the trend start.
+   No NULL values/missing values are observed here
+   
+   4. acquisition_channel
+      organic	4,023
+      paid	3,490
+      referral	1,192
+      email	708
+      affiliate	587
+      The distribution shows that the maximum number of acquisitions has happened organically, followed by the rest.
+      No null/missing values observed.
+
+   5. Source
+      source	n
+       linkedin	1,496
+       affiliate	1,446
+      direct	1,424
+       newsletter	1,422
+       meta	1,421
+       youtube	1,396
+       google	1,395
+      Almost a good equal distribution has happened here. 7 sources present.
+       No null/missing values observed.
+    
+    6. utm_campaign
+       utm_campaign	n
+       clearance	1,734
+       retargeting	1,726
+       new_user	1,709
+       diwali_sale	1,638
+       winter_drop	1,601
+       brand_push	1,592
+
+       Again, a good distribution almost similar for all campaign types. Total of 6 campaigns.
+        No null/missing values observed.
+
+2. Orders:
+   1. Status
+      status	n
+       delivered	19,779
+       shipped	7,715
+       paid	3,946
+       packed	3,887
+       cancelled	2,178
+       placed	1,897
+      SHIPPED	248
+       DELIVERED	200
+       Shipped	150
+
+   Most of the orders have the status as delivered, followed by shipped. There is an inconsistency with the values being entered, which have to be standardised before analysis. i.e., shipped has been repeated 3 times and delivered 2 times. There are only 6 categories otherwise.
+   No null/missing values observed.
+
+ 2.payment_status
+       payment_status	n
+       paid	37,822
+       failed	2,178
+   There are only two categories here where the customers' paid status is clearly more than the failed status.
+   No null/missing values observed.
+
+3. Addresses
+  1. country	n
+       India	13,929
+       United States	2,071
+
+There are no NULL/missing values in the data. There is a clear distribution between the 2 categories i.e., India and the US. Indian customers are in the majority here.
+In the customers. country column, there were missing/null values. Maybe we could do something with this data here, compare, and conclude.
+
+4. order_status_history
+   1. status	n
+       placed	40,000
+       paid	36,055
+       packed	32,089
+       shipped	28,183
+       delivered	20,043
+       cancelled	2,044
+       Compare with Orders. Status, this is clearer.
+   No null/missing values observed.
+
+5. Devices
+   1.device_type
+   device_type	n
+       mobile	61,466
+       desktop	21,168
+       tablet	2,534
+   Device type shows that they sell mobiles, desktops, and tablets. They have the highest number of mobile collections.
+    No null/missing values observed.
+
+6. session_channels
+   channel	n
+        organic	39,924
+       paid	34,905
+       referral	12,146
+       email	6,995
+       affiliate	6,030
+
+   The highest is through organic sessions, followed by the rest.
+   No null/missing values observed.
+
+7.payment_transactions
+   gateway
+   gateway	n
+razorpay	18,072
+payu	9,948
+stripe	7,239
+cash	4,775
+
+The maximum number of transactions go through Razorpay, followed by the rest.
+ No null/missing values observed.
+
+8. price_lists
+   currency
+   currency	n
+USD	1
+INR	1
+
+Only USD or INR transactions are happening.
+ No null/missing values observed.
+
+9. shipping_carriers
+    carrier_name
+   carrier_name	n
+Delhivery	1
+EcomExpress	1
+Bluedart	1
+
+Three different carriers are used for shipping
+
+10. shipping_methods
+    method_name
+    method_name	n
+same_day	1
+standard	1
+express	1
+
+Three different methods of shipping are available.
+
+11. Refunds.
+    Refund status
+    method_name	n
+succeeded	227
+initiated	20
+failed	13
+
+The maximum number of refunds has succeeded.
+
+**E - Row counts:**
+
+```sql
+select relname as table_name, n_live_tup as approx_row_count
+from pg_stat_user_tables
+where schemaname = 'ecom'
+order by n_live_tup desc;
+```
+
+| Table Name             | Approx. Row Count |
+| ---------------------- | ----------------: |
+| session_events         |           292,903 |
+| order_status_history   |           158,414 |
+| experiment_assignments |           140,670 |
+| attribution_touches    |           100,000 |
+| sessions               |           100,000 |
+| devices                |            85,168 |
+| order_items            |            81,806 |
+| payment_transactions   |            40,034 |
+| orders                 |            40,000 |
+| payment_intents        |            40,000 |
+| attribution_campaigns  |            38,405 |
+| shipments              |            32,089 |
+| inventory_movements    |            30,207 |
+| prices                 |            24,180 |
+| loyalty_transactions   |            21,475 |
+| segment_memberships    |            16,461 |
+| addresses              |            16,000 |
+| customer_addresses     |            16,000 |
+| product_variants       |            12,090 |
+| customers              |            10,000 |
+| product_reviews        |             8,000 |
+| product_images         |             7,188 |
+| notifications          |             6,856 |
+| products               |             4,000 |
+| loyalty_accounts       |             3,000 |
+| return_items           |             2,004 |
+| inventory_items        |             2,000 |
+| return_requests        |             1,603 |
+| refunds                |               260 |
+| brands                 |               120 |
+| marketing_campaigns    |               100 |
+| coupons                |                50 |
+| promotion_rules        |                30 |
+| promotions             |                20 |
+| categories             |                18 |
+| experiment_variants    |                12 |
+| customer_segments      |                10 |
+| return_reasons         |                 8 |
+| experiments            |                 6 |
+| payment_methods        |                 5 |
+| shipping_methods       |                 3 |
+| shipping_carriers      |                 3 |
+| price_lists            |                 2 |
+
+**F. Empty tables**
+**These tables have no data at all**
+
+| collections            |                 0 |
+| collection_products    |                 0 |
+| consents               |                 0 |
+
+**G - ER DIAGRAM**
+```mermaid
+erDiagram
+    customers ||--o{ orders : places
+    orders ||--|{ order_items : contains
+    order_items }o--|| product_variants : variant
+    product_variants }o--|| products : sku_of
+    products }o--|| categories : belongs_to
+
+    orders ||--o{ payment_intents : pays_via
+    payment_intents ||--o{ payment_transactions : attempts
+
+    orders ||--o{ shipments : ships
+
+    orders ||--o{ refunds : may_have
+
+    orders ||--o{ return_requests : may_return
+    return_requests ||--|{ return_items : contains
+
+    customers ||--o{ sessions : starts
+    sessions ||--o{ session_events : logs
+    sessions ||--o{ attribution_touches : records
+```
+
+**H - Five things I discovered**
+1. Orders.status had SHIPPED,shipped,DELIVERED, delivered in different forms
+2. customers.country has null, N/A, India and United States
+3. No declared foreign keys
+4. As mentioned before 3 tables were empty collections, consents,collection_products
+5. learnt it the hard way payment_status and order_status are different
+6. some orders have multiple session_events
+7. Attribution redistributes revenue
+8. payment_transactions only stores failed errors
+9. A group of high value customers contribute majorly to the revenue
+
+**May be useful later:**
 
 Customer --->> orders, order_items, returns, membership, sessions, addresses, payment_intents, shipments
 Products -->> prices, product_variants,inventory
