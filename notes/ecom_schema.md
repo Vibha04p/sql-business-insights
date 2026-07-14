@@ -706,13 +706,9 @@ erDiagram
 ```
 
 **E. Five Things That Surprised Me**
-1. Orders.status had SHIPPED,shipped,DELIVERED, delivered in different forms
-2. customers.country has null, N/A, India and United States
-3. No declared foreign keys
-4. As mentioned before 3 tables were empty collections, consents,collection_products
-5. learnt it the hard way payment_status and order_status are different
-6. some orders have multiple session_events
-7. Attribution redistributes revenue
-8. payment_transactions only stores failed errors
-9. A group of high value customers contribute majorly to the revenue
+1. Orders.status had SHIPPED, shipped,DELIVERED, delivered in different forms
+2. customers.country has null, N/A, India, and United States
+3. A group of high-value customers contribute majorly to the revenue
+4. I learnt it the hard way: payment_status and order_status are different
+5. Some orders have multiple session_events
 
