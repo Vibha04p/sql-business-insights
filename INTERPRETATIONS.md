@@ -1,3 +1,46 @@
+## Q3 — Funnel Conversion by Acquisition Channel
+
+**What the query does (1 sentence):** Aggregates sessions through the
+product-view → ATC → checkout → purchase funnel, split by acquisition channel.
+
+**Pattern choice (1-2 sentences):** Used `count(distinct session_id) filter
+(where ...)` per stage rather than 5 left joins — cleaner SQL, no row
+explosion, single pass over `session_events`.
+
+**Business interpretation (2-3 sentences):** Organic search has the highest
+session-to-purchase rate at 4.2%, but paid social drives 3x the absolute
+revenue despite a 1.1% rate — volume beats efficiency at the current spend
+level. The "unknown" channel is 18% of sessions and 14% of revenue, which
+means attribution is broken on roughly 1 in 6 orders.
+
+**What I'd ask next:** Is the paid-social rate dropping over time? A stable
+low rate is a CAC problem; a falling rate is a creative-fatigue problem.
+```
+Q1 - Daily Business Summary with DoD and Same-Weekday WoW
+
+What the query does - The objective of this query is to monitor the business's daily performance by tracking revenue, refunds, order volume, Average Order Value (AOV), payment success, and cancellations, while comparing performance with the previous day and the same weekday of the previous week.
+
+Pattern choice  - I created three CTEs to separate the order data, refund data, and the final business metrics, making the query easier to read and maintain. The final daily_metrics CTE performs all prerequisite calculations before the final output. DATE_TRUNC was used to aggregate data at a daily level, LAG was used to compare revenue with the previous day and the same weekday of the previous week, FILTER was used for conditional aggregations, and COALESCE/NULLIF ensured missing values and division operations were handled safely.
+
+Business interpretation -  Revenue remained relatively strong during March and early April before declining through mid-April, May, and further into June. Order volumes peaked during April, which tapered down by June. However, the average AOV has been quite consistent. This suggests that customers continued spending a similar amount per order despite declining order volumes. Refunds have been higher during the periods of April and May, which could be because of higher sales rather than declining product quality. The day-over-day and week-over-week comparisons also show a generally declining revenue trend. Since Average Order Value remained relatively stable, the decline appears to be driven more by lower order volumes than by customers spending less per order.
+
+What I'd ask next: I would investigate why there were more sales in March and April, and why Average Order Value remained stable despite declining revenue. I'd track the reason for returns- is it just because the sales were higher, higher returns, or was a particular category of product at fault? I'd also check why the weekly report trends negatively. I would investigate whether there was a consistent mix of products, pricing, or promotions that kept the AOV stable.
+
+Q2 - Monthly Signup Cohort Retention
+
+What the query does - The objective of this query is to measure how well customers acquired in a particular month are retained over the first three months after signing up. This helps evaluate customer retention and the quality of newly acquired customers over time.
+
+Pattern choice  - I created a CTE named customer_first_order_month to ensure the retention analysis considered only customers with completed purchases rather than cancelled orders. I then created another CTE to calculate the required metrics, including cohort size and the number of customers retained in Months 1, 2, and 3. I used the month + interval '1 month' to compare customer activity across subsequent months, and CASE expressions in the final query to classify whether a customer was retained in each month.
+
+Business interpretation - Cohort sizes in April and May were almost twice the size of those in March and June. Despite having a smaller cohort, March showed a higher retention rate than both April and May, suggesting that a larger cohort size does not necessarily lead to better retention. I also observed that retention declined with each passing month, with the highest retention occurring in Month 1. Since the later cohorts have not yet completed three months, I can only compare the retention rates for the periods where data is available.
+
+What I'd ask next: I would investigate why the signups were higher in April and May, the quality of the customer, and whether there was a promotion. Pricing strategy? Were there any repeat customers signing up from the same medium for offers or inaugural deals?. I'd further investigate and find out if the origin of the signups in March was the reason for the higher retention rate.
+
+Q3 - Funnel Conversion by Acquisition Channel
+What the query does - The objective of this query is to find out exactly at what point in the view-to-purchase process the business is losing customers. This helps evaluate where the business is losing the interest of the customer and to find out at what rate we are losing/gaining customers.
+Pattern choice  - I created a CTE named channels_per_session to filter out and categorize the number of distinct session_ids into direct if it has no value,product_view_sessions, add_to_cart_sessions,begin_checkout_sessions,purchase_sessions. The final select I used all of the above to keep it less cluttered and calculated the rate of each session conversion.
+Business interpretation - The business has maximum customers through the organic channel followed by paid, referral,email, affiliate and direct respectively. view_to_cart_rate and cart_to_checkout_rate has been constant over all the mediums except for direct, checkout_to_purchase_rate has very low deviation with email being the highest. session_to_purchase_rate also shows the same trend as checkout_to_purchase_rate.
+What I'd ask next: How is the conversion rate similar for every session?
 Q7 – Delivery SLA Breach by Carrier × Shipping Method
 Business Question
 
