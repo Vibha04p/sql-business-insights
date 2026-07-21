@@ -1,14 +1,10 @@
---### Q7 — Delivery SLA Breach by Carrier × Shipping Method
-
---**Ops Head question:** *"Who's missing the 5-day SLA, and by how much?"*
-
---**SLA:** `delivery_days = delivered_at::date - shipped_at::date`. Late if `> 5`.
-
---**Output:** `carrier, shipping_method, delivered_orders, avg_delivery_days, median_delivery_days, p90_delivery_days, late_deliveries, late_rate`
-
---**Sanity check:** `avg_delivery_days <= p90_delivery_days` on every row (mean ≤ p90 in any sane distribution). `late_rate ∈ [0, 1]`.
-
---**Pattern note:** `percentile_cont(0.9) within group (order by delivery_days)`. Many candidates have never used this — knowing it signals seniority. Shipments where `delivered_at IS NULL` are excluded (in transit). If `shipped_at > delivered_at` exists, surface it in your interpretation as a data quality finding.
+-- Q7: Delivery SLA Breach by Carrier and Shipping Method
+-- Business Question: Which carriers are missing the 5-day delivery SLA, and by how much?
+-- Owner: Vibha P | Last updated:2026-07-10
+-- Sanity check:
+-- 1. avg_delivery_days should be less than or equal to p90_delivery_days.
+-- 2. late_rate should be between 0 and 1.
+-- 3. Delivered orders should have delivered_at >= shipped_at.
 
 with carrier_orders as (
     SELECT
