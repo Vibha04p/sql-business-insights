@@ -1,14 +1,10 @@
---### Q8 — Customer LTV + Bucket Share of Revenue
+-- Q8: Customer Lifetime Value and Revenue Share
+-- Business Question: Who are the highest-value customers, and how much revenue does each LTV bucket contribute?
+-- Owner: Vibha P | Last updated:2026-07-10
+-- Sanity check:
+-- 1. Sum(total_revenue) across customers should equal non-cancelled order revenue (within 0.5%).
+-- 2. Revenue share across all LTV buckets should sum to 1.
 
---**CRM Lead question:** *"Who are our top spenders, and what share of revenue do they represent?"*
-
---**Buckets:** `0-999`, `1000-4999`, `5000-19999`, `20000+`
-
---**Output:** `customer_id, first_order_date, last_order_date, total_orders, total_revenue, aov, ltv_bucket, ltv_bucket_share_of_revenue`
-
---**Sanity check:** `sum(total_revenue)` across all customers equals revenue from `ecom.orders` (excluding cancelled), within 0.5%. `ltv_bucket_share_of_revenue` summed across distinct buckets equals 1.0.
-
---**Pattern note:** `case when` for bucketing; bucket-share-of-revenue needs a window: `sum(total_revenue) over (partition by ltv_bucket) / sum(total_revenue) over ()`. Mixing row-level and aggregate-level reasoning is a tier-up signal.
 with customer_metrics as(
     SELECT
         o.customer_id as customer_id
