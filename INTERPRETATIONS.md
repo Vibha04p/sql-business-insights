@@ -20,8 +20,11 @@ What I'd ask next: I would investigate why the signups were higher in April and 
 
 Q3 - Funnel Conversion by Acquisition Channel
 What the query does - The objective of this query is to identify where customers drop off in the purchase funnel and compare how efficiently each acquisition channel moves customers from one stage to the next. This helps identify where the business is losing potential customers during the purchase journey and measure the conversion rate at each stage of the funnel.
+
 Pattern choice  -I created a CTE named channels_per_session to aggregate the number of distinct session IDs by acquisition channel, classifying sessions with no attribution as direct while calculating the number of product view, add-to-cart, begin-checkout, and purchase sessions. I used COUNT(DISTINCT session_id) FILTER (...) to calculate all funnel stages in a single pass over session_events, avoiding multiple joins and preventing row duplication. A single LEFT JOIN to session_channels was used to assign each session to its acquisition channel. The final SELECT uses these metrics to calculate the conversion rate at each stage of the funnel.
+
 Business interpretation - Organic generated the highest number of sessions, followed by Paid, Referral, Email, Affiliate, and Direct. The view-to-cart and cart-to-checkout conversion rates remained remarkably consistent across all acquisition channels, with Direct being the only noticeable exception; Checkout-to-purchase and overall session-to-purchase conversion rates also showed very little variation across channels, with Email recording the highest checkout-to-purchase conversion rate. Further investigation is required to understand why the conversion rates are so similar across acquisition channels.
+
 What I'd ask next: Why are funnel conversion rates so similar across acquisition channels? Is this because customers behave similarly after entering the funnel, or because the website experience is consistent across all acquisition channels? 
 
 Q4- Top Products by Net Revenue (After Refunds)
