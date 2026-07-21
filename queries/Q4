@@ -1,13 +1,10 @@
--- ### Q4 — Top Products by Net Revenue (After Refunds)
---**CFO question:** *“Which products actually make us money — net of returns?”*
---**Output:** `product_id, product_name, category, gross_revenue, orders_count, units_sold, returns_count, return_rate, refunds_amount, net_revenue`
---**Sanity check:** `sum(gross_revenue)` across all products equals `sum(qty * unit_price)` from `ecom.order_items` for the same window, within 0.5%.
---**Pattern note:** Three CTEs (`product_revenue`, `product_returns`, `product_refunds`) joined in the final select. Don’t try a single join — you’ll double-count.
---### Q4 — Top Products by Net Revenue (After Refunds)
---**CFO question:** *“Which products actually make us money — net of returns?”*
---**Output:** `product_id, product_name, category, gross_revenue, orders_count, units_sold, returns_count, return_rate, refunds_amount, net_revenue`
---**Sanity check:** `sum(gross_revenue)` across all products equals `sum(qty * unit_price)` from `ecom.order_items` for the same window, within 0.5%.
---**Pattern note:** Three CTEs (`product_revenue`, `product_returns`, `product_refunds`) joined in the final select. Don’t try a single join — you’ll double-count.
+-- Q4: Top Products by Net Revenue (After Refunds)
+-- Business Question: Which products generate the highest net revenue after accounting for returns and refunds?
+-- Owner: Vibha P | Last updated: 2026-06-08
+-- Sanity check:
+-- 1. Sum(gross_revenue) should equal sum(qty * unit_price) from ecom.order_items for the same date range (within 0.5%).
+-- 2. Net revenue should equal gross revenue minus refund amount.
+
 WITH product_revenue AS (
     SELECT
         p.product_id
