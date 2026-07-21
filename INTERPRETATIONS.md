@@ -37,7 +37,7 @@ The data does not show a direct relationship between units sold and returns. Hig
 Categories such as Kitchen, Makeup, Shoes, Skincare, and Tops recorded very few returns during the analysis period. The reason cannot be determined from this dataset alone.
 Products in the Smartwatch, Speakers, and Headphones categories generate a substantial portion of total revenue and also account for higher refund amounts. This is likely influenced by their higher sales volume rather than unusually high return rates. The sales volume of these categories is also considerably higher than categories such as Kitchen, Makeup, Shoes, Skincare, and Haircare, which contribute relatively less revenue overall.
 
-What I'd ask next: Which products have both high sales volume and high return volume, and are the returns associated with product quality, shipping issues, incorrect sizing, or customer expectations? Why do some products record no returns? Is it because these products are non-returnable, or because customers are genuinely satisfied with them?Why do a few products generate negative net revenue? Although their contribution to overall revenue is small, understanding the underlying cause could help reduce future losses.
+What I'd ask next: Which products have both high sales volume and high return volume, and are the returns associated with product quality, shipping issues, incorrect sizing, or customer expectations? Why do some products record no returns? Is it because these products are non-returnable, or because customers are genuinely satisfied with them? Why do a few products generate negative net revenue? Although their contribution to overall revenue is small, understanding the underlying cause could help reduce future losses.
 
 Q5- Category Health: Purchases → Returns
 What the query does - The objective of this query is to understand category-wise performance by analysing sales, sales volume, returns, and refunds. It helps identify which categories generate the highest revenue, which have the highest sales volume, and which experience the most returns. The query also calculates the return_rate_pct to understand the proportion of returned units for each category.
@@ -129,5 +129,4 @@ What I'd ask next: Why does every order have the same first-touch and last-touch
 Why does the Paid channel contribute less revenue than Direct and Organic despite marketing investment?
 What strategies can further strengthen Direct and Organic traffic?
 Can improvements in Email, Referral, or Affiliate campaigns increase their contribution to revenue?
-What the query does - The objective of this query is 
 
