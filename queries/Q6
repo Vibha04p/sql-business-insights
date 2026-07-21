@@ -1,12 +1,10 @@
---### Q6 — Payment Failure Analysis (Method × Top Error Code)
+-- Q6: Payment Failure Analysis
+-- Business Question: Which payment methods fail the most, and what are the most common failure reasons?
+-- Owner: Vibha P | Last updated: 2026-06-13
+-- Sanity check:
+-- 1. failure_rate should be between 0 and 1.
+-- 2. top_error_share_of_failures should be between 0 and 1.
 
---**Payments PM question:** *"Which payment methods fail most, and what's the top reason?"*
-
---**Output:** `payment_method, attempts, failures, failure_rate, top_error_code, top_error_message, top_error_share_of_failures`
-
---**Sanity check:** `failure_rate` and `top_error_share_of_failures` both in `[0, 1]`.
-
---**Pattern note:** Two CTEs. CTE 1 aggregates attempts/failures per method. CTE 2 ranks error codes per method with `row_number() over (partition by payment_method order by error_count desc)` and filters `rn = 1`. Then join. A `group by` alone cannot pick the top error per method — this is the classic top-N-per-group pattern, a top-5 SQL interview question.
 with payments as (
     select
         p.method_name as payment_method
