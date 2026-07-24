@@ -58,6 +58,49 @@ The following dashboards highlight a few of the key analyses performed during th
 
 *Segments customers by lifetime value to understand revenue contribution and support retention strategies.*
 
+## Business Impact
+
+The insights from this analysis can help different business teams make informed decisions:
+
+- **Leadership:** Monitor business growth through daily revenue, order volume, and average order value trends.
+- **Marketing:** Optimize customer acquisition by investing in high-performing channels and improving campaign effectiveness.
+- **Customer Success:** Improve customer retention by identifying repeat purchase patterns and high-value customer segments.
+- **Merchandising:** Focus on profitable products while monitoring categories with high return rates.
+- **Operations:** Improve delivery performance by identifying carriers with frequent SLA breaches.
+- **Payments:** Reduce payment failures by addressing recurring gateway errors and improving the checkout experience.
+
+## Skills Demonstrated
+
+- Advanced SQL querying
+- Common Table Expressions (CTEs)
+- Window Functions
+- Cohort Analysis
+- Funnel Analysis
+- Customer Lifetime Value (LTV) Analysis
+- Marketing Attribution Analysis
+- Time Series Analysis
+- Business KPI Reporting
+- Data Validation and Quality Checks
+
+## Challenges & Learnings
+
+Working with a realistic e-commerce dataset required more than writing SQL queries. Throughout the project, I learned to:
+
+- Translate business questions into measurable SQL analyses.
+- Validate query outputs through sanity checks to ensure accuracy.
+- Handle incomplete and inconsistent data while maintaining reliable results.
+- Use window functions and CTEs to solve complex analytical problems.
+- Present technical findings in a business-friendly format with actionable recommendations.
+- Document the analytical process so the project can be easily understood and reproduced by others.
+
+## Future Improvements
+
+- Build an interactive BI dashboard using Tableau or Power BI.
+- Automate recurring KPI reports.
+- Add predictive models for customer churn and lifetime value.
+- Expand marketing attribution using multi-touch attribution models.
+- Perform A/B testing analysis for marketing campaigns.
+
 
 ## Repository Structure
 
