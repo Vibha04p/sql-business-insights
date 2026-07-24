@@ -12,8 +12,6 @@ This project uses SQL to analyse business performance across sales, customer beh
 
 ### Key Findings
 
-### Key Findings
-
 - Revenue declined because order volume decreased while average order value remained relatively stable, indicating that growth depends on increasing customer acquisition and repeat purchases.
 - Customers in the ₹20,000+ lifetime value bucket contribute the majority of total revenue, highlighting the importance of customer retention and loyalty.
 - Organic and Direct channels generated the highest revenue, while Email showed the strongest checkout-to-purchase conversion, suggesting opportunities to optimise marketing investments.
@@ -34,6 +32,25 @@ This project uses SQL to analyse business performance across sales, customer beh
 | Q9    | [09_repeat_purchase_interval.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/09_repeat_purchase_interval.sql)                                 | Retention Team      | How long does it take customers to place another order?                                   | LEAD(), Date Arithmetic, Window Functions               |
 | Q10   | [10_attribution_comparison.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/10_attribution_comparison.sql)                                     | Marketing           | How does revenue differ under first-touch and last-touch attribution models?              | CTEs, Window Functions, Conditional Aggregation           |
 
+---
+## Repository Structure
+
+```
+sql-business-insights/
+│
+├── queries/
+├── notes/
+├── images/
+│   ├── q1_daily_business_summary.png
+│   ├── q7_delivery_sla_breach.png
+│   └── q8_customer_lifetime_value.png
+├── INTERPRETATIONS.md
+├── README.md
+└── case_study_link.md
+```
+
+---
+
 ## Sample Dashboards
 
 ### Daily Business Summary (Q1)
@@ -47,6 +64,27 @@ This project uses SQL to analyse business performance across sales, customer beh
 ### Customer Lifetime Value (Q8)
 
 ![Customer Lifetime Value](images/q8_customer_lifetime_value.png)
+
+
+---
+
+## Tech Stack
+
+- PostgreSQL
+- Metabase
+- GitHub
+- Notion
+- Mermaid (ER Diagram)
+
+---
+
+## How to Run
+
+1. Open the SQL file for the business question you want to analyse.
+2. Execute it in PostgreSQL or the provided Metabase environment using the `ecom` schema.
+3. Review the query output and accompanying business interpretation.
+4. Refer to the Notion case study for detailed insights and recommendations.
+
 ## Business Impact
 
 The insights from this analysis can help different business teams make informed decisions:
@@ -71,65 +109,15 @@ The insights from this analysis can help different business teams make informed 
 - Business KPI Reporting
 - Data Validation and Quality Checks
 
-## Challenges & Learnings
-
-Working with a realistic e-commerce dataset required more than writing SQL queries. Throughout the project, I learned to:
-
-- Translate business questions into measurable SQL analyses.
-- Validate query outputs through sanity checks to ensure accuracy.
-- Handle incomplete and inconsistent data while maintaining reliable results.
-- Use window functions and CTEs to solve complex analytical problems.
-- Present technical findings in a business-friendly format with actionable recommendations.
-- Document the analytical process so the project can be easily understood and reproduced by others.
-
-## Future Improvements
-
-- Build an interactive BI dashboard using Tableau or Power BI.
-- Automate recurring KPI reports.
-- Add predictive models for customer churn and lifetime value.
-- Expand marketing attribution using multi-touch attribution models.
-- Perform A/B testing analysis for marketing campaigns.
-
-
-## Repository Structure
-
-```
-sql-business-insights/
-│
-├── queries/
-├── notes/
-├── images/
-│   ├── q1_daily_business_summary.png
-│   ├── q7_delivery_sla_breach.png
-│   └── q8_customer_lifetime_value.png
-├── INTERPRETATIONS.md
-├── README.md
-└── case_study_link.md
-```
-
 ---
 
-## Tech Stack
+## Reflection
 
-- PostgreSQL
-- Metabase
-- GitHub
-- Notion
-- Mermaid (ER Diagram)
-
----
-
-## How to Run
-
-1. Open the SQL file for the business question you want to analyse.
-2. Execute it in PostgreSQL or the provided Metabase environment using the `ecom` schema.
-3. Review the query output and accompanying business interpretation.
-4. Refer to the Notion case study for detailed insights and recommendations.
-
----
-## Metabase Collection
-
-🔗[[ [Metabase Collection](YOUR_METABASE_PUBLIC_LINK)](https://metabase.topfolio.in/collection/95-task-1-sql-foundation)](https://metabase.topfolio.in/collection/95-task-1-sql-foundation)
+- Strengthened my SQL skills using CTEs, window functions, and conditional aggregation.
+- Learned to translate business questions into meaningful SQL analyses.
+- Improved my confidence in validating query outputs through sanity checks.
+- Gained experience documenting technical work for business stakeholders.
+- Developed a better understanding of end-to-end business analytics using SQL.
 
 ---
 
@@ -144,7 +132,3 @@ sql-business-insights/
 🔗 https://www.linkedin.com/in/vibha-p/
 
 ---
-
-## Reflection
-
-Working on this project strengthened both my SQL skills and my ability to think like a business analyst. I became more confident using CTEs, window functions, conditional aggregation, and percentile calculations to solve real business problems. More importantly, I learned to translate SQL outputs into actionable insights rather than simply reporting numbers. I also gained experience validating results through sanity checks and documenting assumptions. If I continued this project, I would explore customer segmentation, predictive modelling, and operational optimisation using additional datasets.
