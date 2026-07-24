@@ -690,16 +690,17 @@ erDiagram
     order_items }o--|| product_variants : references
     product_variants }o--|| products : variant_of
     products }o--|| categories : belongs_to
+    products }o--|| brands : belongs_to
 
     orders ||--o{ payment_intents : has
-    payment_intents ||--o{ payment_transactions : processed_by
+    payment_intents ||--o{ payment_transactions : attempts
     payment_intents }o--|| payment_methods : uses
 
-    orders ||--o{ shipments : shipped_as
-    shipments }o--|| shipping_carriers : handled_by
-    shipments }o--|| shipping_methods : delivered_via
+    orders ||--o{ order_status_history : tracks
 
-    orders ||--o{ order_status_history : status_updates
+    orders ||--o{ shipments : ships
+    shipments }o--|| shipping_carriers : handled_by
+    shipments }o--|| shipping_methods : delivered_by
 
     orders ||--o{ return_requests : may_have
     return_requests ||--|{ return_items : contains
@@ -709,27 +710,29 @@ erDiagram
     customer_addresses }o--|| addresses : references
 
     customers ||--o{ sessions : starts
+    sessions }o--|| devices : uses
     sessions ||--o{ session_events : records
     sessions ||--o{ attribution_touches : tracks
-    sessions }o--|| devices : uses
 
     customers ||--o{ segment_memberships : belongs_to
-    segment_memberships }o--|| customer_segments : member_of
-
-    products }o--|| brands : manufactured_by
+    customer_segments ||--o{ segment_memberships : defines
 
     price_lists ||--o{ prices : defines
+    product_variants ||--o{ prices : priced_for
     price_lists ||--o{ orders : used_for
-    product_variants ||--o{ prices : priced_in
+
+    products ||--o{ product_images : has
+    categories ||--o{ promotion_rules : governed_by
+    promotions ||--o{ orders : applied_to
 
     experiments ||--o{ experiment_variants : has
     experiments ||--o{ experiment_assignments : assigns
     experiment_variants ||--o{ experiment_assignments : variant
 
     marketing_campaigns ||--o{ attribution_campaigns : linked_to
-    attribution_campaigns ||--o{ attribution_touches : attributes
-
+    attribution_campaigns ||--o{ attribution_touches : maps_to
 ```
+
 
 **E. Five Things That Surprised Me**
 1. Orders.status had SHIPPED, shipped,DELIVERED, delivered in different forms
