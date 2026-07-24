@@ -494,13 +494,13 @@ I have identified the following key tables that could be interconnected and may 
       source	n
        linkedin	1,496
        affiliate	1,446
-      direct	1,424
+       direct	1,424
        newsletter	1,422
        meta	1,421
        youtube	1,396
        google	1,395
       Almost a good equal distribution has happened here. 7 sources present.
-       No null/missing values observed.
+      No null/missing values observed.
     
     6. utm_campaign
        utm_campaign	n
@@ -516,14 +516,14 @@ I have identified the following key tables that could be interconnected and may 
 
 2. Orders:
    1. Status
-      status	n
+       status	n
        delivered	19,779
        shipped	7,715
        paid	3,946
        packed	3,887
        cancelled	2,178
        placed	1,897
-      SHIPPED	248
+       SHIPPED	248
        DELIVERED	200
        Shipped	150
 
@@ -538,7 +538,7 @@ I have identified the following key tables that could be interconnected and may 
    No null/missing values observed.
 
 3. Addresses
-  1. country	n
+  1.   country	n
        India	13,929
        United States	2,071
 
@@ -546,7 +546,7 @@ There are no NULL/missing values in the data. There is a clear distribution betw
 In the customers. country column, there were missing/null values. Maybe we could do something with this data here, compare, and conclude.
 
 4. order_status_history
-   1. status	n
+   1.  status	n
        placed	40,000
        paid	36,055
        packed	32,089
@@ -558,7 +558,7 @@ In the customers. country column, there were missing/null values. Maybe we could
 
 5. Devices
    1.device_type
-   device_type	n
+       device_type	n
        mobile	61,466
        desktop	21,168
        tablet	2,534
@@ -566,8 +566,8 @@ In the customers. country column, there were missing/null values. Maybe we could
     No null/missing values observed.
 
 6. session_channels
-   channel	n
-        organic	39,924
+       channel	n
+       organic	39,924
        paid	34,905
        referral	12,146
        email	6,995
@@ -579,10 +579,10 @@ In the customers. country column, there were missing/null values. Maybe we could
 7.payment_transactions
    gateway
    gateway	n
-razorpay	18,072
-payu	9,948
-stripe	7,239
-cash	4,775
+   razorpay	18,072
+   payu	9,948
+   stripe	7,239
+   cash	4,775
 
 The maximum number of transactions go through Razorpay, followed by the rest.
  No null/missing values observed.
@@ -590,8 +590,8 @@ The maximum number of transactions go through Razorpay, followed by the rest.
 8. price_lists
    currency
    currency	n
-USD	1
-INR	1
+   USD	1
+   INR	1
 
 Only USD or INR transactions are happening.
  No null/missing values observed.
@@ -599,27 +599,27 @@ Only USD or INR transactions are happening.
 9. shipping_carriers
     carrier_name
    carrier_name	n
-Delhivery	1
-EcomExpress	1
-Bluedart	1
+   Delhivery	1
+   EcomExpress	1
+   Bluedart	1
 
 Three different carriers are used for shipping
 
 10. shipping_methods
     method_name
     method_name	n
-same_day	1
-standard	1
-express	1
+    same_day	1
+    standard	1
+    express	1
 
 Three different methods of shipping are available.
 
 11. Refunds.
     Refund status
     method_name	n
-succeeded	227
-initiated	20
-failed	13
+    succeeded	227
+    initiated	20
+    failed	13
 
 The maximum number of refunds has succeeded.
 
@@ -644,12 +644,9 @@ Gave me no foreign keys, or the result was nothing
 Explored logical relationships between tables. Ran the following query for every relationship I could find between tables:
 
 
-1.orders.customer_id → customers.customer_id
-
-2.addresses.address_id -> customer_addresses.address_id
-
-3.brands.brand_id -> products.brand_id
-
+1. orders.customer_id → customers.customer_id
+2. addresses.address_id -> customer_addresses.address_id
+3. brands.brand_id -> products.brand_id
 4. collections.collection_id ->collection_products.collection_id
 5. customer_segments.segment_id -> segment_memberships.segment_id
 6. return_requests.customer_id ->customers.customer_id
