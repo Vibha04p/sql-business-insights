@@ -2,13 +2,15 @@
 
 ## Project Overview
 
-This project analyses an e-commerce dataset using PostgreSQL to answer ten business questions across sales, customer behaviour, marketing, operations, payments, retention, and customer lifetime value. The goal was to move beyond writing SQL queries and generate actionable business insights that can support data-driven decision-making.
+This project analyses an e-commerce dataset using PostgreSQL to answer ten business questions across sales, customer behaviour, marketing, payments, operations, retention, and customer lifetime value. The project demonstrates how SQL can be used to generate actionable business insights for decision-making.
 
 ---
 
 ## Executive Summary
 
-This project analyses an e-commerce dataset using PostgreSQL to answer ten business questions covering sales, customer behaviour, marketing, payments, operations, and logistics. The objective was to use SQL to identify business trends, measure performance, and generate actionable recommendations that support data-driven decision-making.
+This project uses SQL to analyse business performance across sales, customer behaviour, marketing, payments, operations, and retention. The analyses identify key trends, measure business performance, and provide actionable recommendations for different stakeholders.
+
+### Key Findings
 
 ### Key Findings
 
@@ -26,38 +28,25 @@ This project analyses an e-commerce dataset using PostgreSQL to answer ten busin
 | Q3    | [03_funnel_conversion_by_acquisition_channel.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/03_funnel_conversion_by_acquisition_channel.sql) | CMO                 | Where do customers drop off in the conversion funnel?                                     | FILTER clause, Conditional Aggregation, CTEs              |
 | Q4    | [04_top_products_net_revenue.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/04_top_products_net_revenue.sql)                                 | Merchandising       | Which products generate the highest net revenue after refunds?                            | CTEs, Proportional Refund Allocation, Aggregations        |
 | Q5    | [05_category_health.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/05_category_health.sql)                                                   | Category Manager    | Which product categories generate the highest revenue and experience the most returns?    | Joins, Conditional Aggregation, Window Functions          |
-| Q6    | [06_payment_failure_analysis.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/06_payment_failure_analysis.sql)                                 | Payments Team       | Which payment methods fail the most and what are the most common failure reasons?         | CTEs, `ROW_NUMBER()`, Aggregations                        |
-| Q7    | [07_delivery_sla_breach.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/07_delivery_sla_breach.sql)                                           | Operations          | Which carriers are missing delivery SLAs?                                                 | Percentiles, Date Arithmetic, Aggregations                |
+| Q6    | [06_payment_failure_analysis.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/06_payment_failure_analysis.sql)                                 | Payments Team       | Which payment methods fail the most and what are the most common failure reasons?         | CTEs, ROW_NUMBER(), Aggregations                        |
+| Q7    | [07_delivery_sla_breach.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/07_delivery_sla_breach.sql)                                           | Operations          | Which carriers are breaching delivery SLAs?                                                 | Percentiles, Date Arithmetic, Aggregations                |
 | Q8    | [08_customer_lifetime_value.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/08_customer_lifetime_value.sql)                                   | CRM / Marketing     | Who are the highest-value customers and how much revenue does each LTV bucket contribute? | Window Functions, CASE Expressions, Aggregations          |
-| Q9    | [09_repeat_purchase_interval.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/09_repeat_purchase_interval.sql)                                 | Retention Team      | How long does it take customers to place another order?                                   | `LEAD()`, Date Arithmetic, Window Functions               |
+| Q9    | [09_repeat_purchase_interval.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/09_repeat_purchase_interval.sql)                                 | Retention Team      | How long does it take customers to place another order?                                   | LEAD(), Date Arithmetic, Window Functions               |
 | Q10   | [10_attribution_comparison.sql](https://github.com/Vibha04p/sql-business-insights/blob/main/queries/10_attribution_comparison.sql)                                     | Marketing           | How does revenue differ under first-touch and last-touch attribution models?              | CTEs, Window Functions, Conditional Aggregation           |
 
 ## Sample Dashboards
-
-The following dashboards highlight a few of the key analyses performed during this project. Interactive versions are available in the shared Metabase collection.
 
 ### Daily Business Summary (Q1)
 
 ![Daily Business Summary](images/q1_daily_business_summary.png)
 
-*Tracks daily revenue, order volume, average order value, and period-over-period performance.*
-
----
-
 ### Delivery SLA Breach Analysis (Q7)
 
-![Delivery SLA Breach Analysis](images/q7_delivery_sla_breach.png)
+![Delivery SLA](images/q7_delivery_sla_breach.png)
 
-*Compares carrier performance, delivery timelines, and SLA compliance to identify operational bottlenecks.*
-
----
-
-### Customer Lifetime Value Analysis (Q8)
+### Customer Lifetime Value (Q8)
 
 ![Customer Lifetime Value](images/q8_customer_lifetime_value.png)
-
-*Segments customers by lifetime value to understand revenue contribution and support retention strategies.*
-
 ## Business Impact
 
 The insights from this analysis can help different business teams make informed decisions:
@@ -105,40 +94,18 @@ Working with a realistic e-commerce dataset required more than writing SQL queri
 ## Repository Structure
 
 ```
-queries/
-│── 01_daily_business_summary.sql
-│── 02_monthly_signup_cohort_retention.sql
-│── 03_funnel_conversion_by_acquisition_channel.sql
-│── 04_top_products_net_revenue.sql
-│── 05_category_health.sql
-│── 06_payment_failure_analysis.sql
-│── 07_delivery_sla_breach.sql
-│── 08_customer_ltv.sql
-│── 09_repeat_purchase_interval.sql
-│── 10_attribution_comparison.sql
-
-notes/
-│── ecom_schema.md
-
-INTERPRETATIONS.md
-README.md
-case_study_link.md
+sql-business-insights/
+│
+├── queries/
+├── notes/
+├── images/
+│   ├── q1_daily_business_summary.png
+│   ├── q7_delivery_sla_breach.png
+│   └── q8_customer_lifetime_value.png
+├── INTERPRETATIONS.md
+├── README.md
+└── case_study_link.md
 ```
-
----
-
-## Business Questions Answered
-
-- Daily business performance
-- Monthly customer retention
-- Marketing funnel conversion
-- Product profitability after refunds
-- Category performance
-- Payment failures
-- Delivery SLA performance
-- Customer lifetime value
-- Repeat purchase behaviour
-- Marketing attribution
 
 ---
 
@@ -148,12 +115,21 @@ case_study_link.md
 - Metabase
 - GitHub
 - Notion
+- Mermaid (ER Diagram)
 
 ---
 
 ## How to Run
 
-The SQL queries were written for the internal Metabase environment using the ecom PostgreSQL schema. Each query can be executed independently in Metabase or any PostgreSQL environment containing the same schema. The queries are designed to answer specific business questions and can be run individually without dependencies on one another.
+1. Open the SQL file for the business question you want to analyse.
+2. Execute it in PostgreSQL or the provided Metabase environment using the `ecom` schema.
+3. Review the query output and accompanying business interpretation.
+4. Refer to the Notion case study for detailed insights and recommendations.
+
+---
+## Metabase Collection
+
+🔗[[ [Metabase Collection](YOUR_METABASE_PUBLIC_LINK)](https://metabase.topfolio.in/collection/95-task-1-sql-foundation)](https://metabase.topfolio.in/collection/95-task-1-sql-foundation)
 
 ---
 
