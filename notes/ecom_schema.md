@@ -682,27 +682,53 @@ Explored logical relationships between tables. Ran the following query for every
 
 
 **D. ER Diagram**
+
 ```mermaid
 erDiagram
     customers ||--o{ orders : places
     orders ||--|{ order_items : contains
-    order_items }o--|| product_variants : variant
-    product_variants }o--|| products : sku_of
+    order_items }o--|| product_variants : references
+    product_variants }o--|| products : variant_of
     products }o--|| categories : belongs_to
 
-    orders ||--o{ payment_intents : pays_via
-    payment_intents ||--o{ payment_transactions : attempts
+    orders ||--o{ payment_intents : has
+    payment_intents ||--o{ payment_transactions : processed_by
+    payment_intents }o--|| payment_methods : uses
 
-    orders ||--o{ shipments : ships
+    orders ||--o{ shipments : shipped_as
+    shipments }o--|| shipping_carriers : handled_by
+    shipments }o--|| shipping_methods : delivered_via
 
-    orders ||--o{ refunds : may_have
+    orders ||--o{ order_status_history : status_updates
 
-    orders ||--o{ return_requests : may_return
+    orders ||--o{ return_requests : may_have
     return_requests ||--|{ return_items : contains
+    return_items }o--|| return_reasons : reason
+
+    customers ||--o{ customer_addresses : has
+    customer_addresses }o--|| addresses : references
 
     customers ||--o{ sessions : starts
-    sessions ||--o{ session_events : logs
-    sessions ||--o{ attribution_touches : records
+    sessions ||--o{ session_events : records
+    sessions ||--o{ attribution_touches : tracks
+    sessions }o--|| devices : uses
+
+    customers ||--o{ segment_memberships : belongs_to
+    segment_memberships }o--|| customer_segments : member_of
+
+    products }o--|| brands : manufactured_by
+
+    price_lists ||--o{ prices : defines
+    price_lists ||--o{ orders : used_for
+    product_variants ||--o{ prices : priced_in
+
+    experiments ||--o{ experiment_variants : has
+    experiments ||--o{ experiment_assignments : assigns
+    experiment_variants ||--o{ experiment_assignments : variant
+
+    marketing_campaigns ||--o{ attribution_campaigns : linked_to
+    attribution_campaigns ||--o{ attribution_touches : attributes
+
 ```
 
 **E. Five Things That Surprised Me**
